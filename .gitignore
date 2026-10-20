@@ -1,0 +1,7 @@
+# duplicate of archive (1)/supply_chain_data.csv
+*.zip
+__pycache__/
+*.pyc
+.vscode/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Supply Chain DSS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9"/><path d="M9 20.5 14 15l4 3.5 5-6.5" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div><b>Supply Chain DSS</b><small class="brand-sub">ระบบสนับสนุนการตัดสินใจ</small></div>
+    </div>
+    <nav class="nav" aria-label="เมนูหลัก">
+      <a href="#overview" data-page="overview"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg><span>ภาพรวม</span></a>
+      <a href="#products" data-page="products"><svg viewBox="0 0 24 24"><path d="M5 8h14l-1.2 12.2a1 1 0 0 1-1 .8H7.2a1 1 0 0 1-1-.8L5 8Z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg><span>สินค้าและยอดขาย</span></a>
+      <a href="#supplier" data-page="supplier"><svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M4 21V11l5 3v-3l5 3V5h6v16"/><path d="M17 9v1M17 13v1M17 17v1"/></svg><span>ประเมินซัพพลายเออร์</span></a>
+      <a href="#inventory" data-page="inventory"><svg viewBox="0 0 24 24"><path d="m3 7.5 9-4.5 9 4.5-9 4.5-9-4.5Z"/><path d="M3 7.5v9l9 4.5 9-4.5v-9"/><path d="M12 12v9"/></svg><span>สต็อกสินค้า</span></a>
+      <a href="#logistics" data-page="logistics"><svg viewBox="0 0 24 24"><path d="M2 6h12v10H2z"/><path d="M14 9.5h4.5L22 13v3h-8"/><circle cx="6.5" cy="17.5" r="2"/><circle cx="17.5" cy="17.5" r="2"/></svg><span>การขนส่ง</span></a>
+      <a href="#data" data-page="data"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="5.5" rx="8" ry="2.8"/><path d="M4 5.5v13c0 1.5 3.6 2.8 8 2.8s8-1.3 8-2.8v-13"/><path d="M4 12c0 1.5 3.6 2.8 8 2.8s8-1.3 8-2.8"/></svg><span>ข้อมูลและการคลีน</span></a>
+    </nav>
+    <div class="side-foot">
+      <button type="button" class="btn ghost theme-btn" id="themeBtn" aria-label="สลับธีมสว่าง/มืด">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.6 6.6 0 0 0 10.5 10.5Z"/></svg><span id="themeLbl">ธีม: ตามระบบ</span>
+      </button>
+      <p class="src" id="srcInfo"></p>
+    </div>
+  </aside>
+
+  <main id="main">
+    <header class="top">
+      <div><h1 id="pageTitle">ภาพรวม</h1><p class="lead" id="pageDesc"></p></div>
+    </header>
+
+    <div class="filters" role="search" aria-label="ตัวกรองข้อมูล">
+      <label class="fld"><span>ประเภทสินค้า</span><select id="fType"></select></label>
+      <label class="fld"><span>สถานที่</span><select id="fLoc"></select></label>
+      <button type="button" class="btn ghost sm" id="fReset">ล้างตัวกรอง</button>
+      <span class="count" id="fCount" aria-live="polite"></span>
+    </div>
+
+    <!-- ===================== OVERVIEW ===================== -->
+    <section class="page" id="p-overview" hidden>
+      <div class="hero-row">
+        <div class="card hero">
+          <span class="lbl">รายได้รวม</span>
+          <div class="hero-num" id="ovRev"></div>
+          <p class="sub" id="ovRevSub"></p>
+        </div>
+        <div class="tiles" id="ovTiles"></div>
+      </div>
+      <div class="card">
+        <div class="card-h"><div><h3>ข้อเสนอแนะจากระบบ</h3><p class="sub">สรุปจากโมเดลการตัดสินใจในแต่ละหน้า ตามตัวกรองและค่าที่ตั้งไว้</p></div></div>
+        <div class="insights" id="ovInsights"></div>
+      </div>
+      <div class="grid g-2">
+        <article class="card chart" id="c-ov-revtype" data-title="รายได้ตามประเภทสินค้า"></article>
+        <article class="card chart" id="c-ov-insp" data-title="ผลตรวจคุณภาพแยกตามประเภทสินค้า" data-sub="สัดส่วนจำนวน SKU"></article>
+        <article class="card chart" id="c-ov-revloc" data-title="รายได้ตามสถานที่"></article>
+        <article class="card chart" id="c-ov-defect" data-title="อัตราของเสียเฉลี่ยตามซัพพลายเออร์" data-sub="ยิ่งต่ำยิ่งดี (%)"></article>
+      </div>
+    </section>
+
+    <!-- ===================== PRODUCTS ===================== -->
+    <section class="page" id="p-products" hidden>
+      <div class="tiles wide" id="prTiles"></div>
+      <div class="grid g-2">
+        <article class="card chart span-2" id="c-pr-scatter" data-title="ราคา กับ จำนวนที่ขายได้" data-sub="แต่ละจุดคือ 1 SKU — ใช้ดูว่าราคามีผลต่อยอดขายหรือไม่"></article>
+        <article class="card chart" id="c-pr-top" data-title="10 อันดับ SKU ที่ทำรายได้สูงสุด"></article>
+        <article class="card chart" id="c-pr-demo" data-title="กลุ่มลูกค้าตามประเภทสินค้า" data-sub="สัดส่วนจำนวนหน่วยที่ขาย"></article>
+      </div>
+      <div class="card">
+        <div class="card-h"><div><h3>สรุปตามประเภทสินค้า</h3></div></div>
+        <div id="prTable"></div>
+      </div>
+    </section>
+
+    <!-- ===================== SUPPLIER ===================== -->
+    <section class="page" id="p-supplier" hidden>
+      <div class="grid g-side">
+        <div class="card controls">
+          <div class="card-h"><div><h3>ตั้งค่าการประเมิน</h3><p class="sub">กำหนดน้ำหนักความสำคัญของแต่ละเกณฑ์ (0–10)</p></div></div>
+          <div class="fld-row">
+            <span class="fld-lbl">วิธีคำนวณ</span>
+            <div class="seg" id="supMethod" role="radiogroup" aria-label="วิธีคำนวณ"></div>
+          </div>
+          <div class="presets" id="supPresets"></div>
+          <div id="supSliders"></div>
+          <details class="howto"><summary>วิธีคำนวณทำงานอย่างไร</summary>
+            <p><b>SAW</b> (Simple Additive Weighting): ปรับค่าแต่ละเกณฑ์เป็น 0–1 (min–max) โดยเกณฑ์ที่ “ยิ่งต่ำยิ่งดี” จะกลับด้าน แล้วรวมแบบถ่วงน้ำหนัก × 100</p>
+            <p><b>TOPSIS</b>: วัดระยะห่างจากทางเลือกในอุดมคติ (ดีที่สุดทุกเกณฑ์) และทางเลือกแย่ที่สุด คะแนน = ระยะห่างจากจุดแย่ ÷ (ผลรวมระยะทั้งสอง) × 100</p>
+            <p><b>ความเสถียร</b>: ทดลองปรับน้ำหนักทีละเกณฑ์เป็น 0×, 0.5×, 1.5×, 2× แล้วนับว่าผู้ชนะยังเป็นรายเดิมกี่ครั้ง</p>
+          </details>
+        </div>
+        <div class="stack-col">
+          <div class="card reco" id="supReco"></div>
+          <article class="card chart" id="c-sup-score" data-title="คะแนนรวม" data-sub="คะแนนเต็ม 100"></article>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h"><div><h3>ผลการดำเนินงานรายเกณฑ์</h3><p class="sub">ตัวเลขคือค่าจริง · สีเข้ม = ดีกว่าเมื่อเทียบกับรายอื่นในเกณฑ์นั้น</p></div></div>
+        <div id="supHeat"></div>
+      </div>
+    </section>
+
+    <!-- ===================== INVENTORY ===================== -->
+    <section class="page" id="p-inventory" hidden>
+      <div class="grid g-side">
+        <div class="card controls">
+          <div class="card-h"><div><h3>สมมติฐานการคำนวณ</h3><p class="sub">ปรับให้ตรงกับธุรกิจของคุณ</p></div></div>
+          <div id="invSliders"></div>
+          <details class="howto" open><summary>สูตรที่ใช้</summary>
+            <p>ความต้องการ/วัน (d) = จำนวนที่ขาย ÷ ช่วงเวลาของยอดขาย</p>
+            <p>จุดสั่งซื้อ (ROP) = d × (Lead time ซัพพลายเออร์ + Safety stock)</p>
+            <p>แนะนำสั่ง = d × (Lead time + Safety stock + รอบการสั่ง) − สต็อกคงเหลือ</p>
+            <p>เฝ้าระวัง = สต็อกต่ำกว่า 1.5 × ROP</p>
+          </details>
+        </div>
+        <div class="stack-col">
+          <div class="tiles five" id="invTiles"></div>
+          <article class="card chart" id="c-inv-status" data-title="สถานะสต็อกตามประเภทสินค้า" data-sub="จำนวน SKU"></article>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h">
+          <div><h3>รายการที่ต้องตัดสินใจ</h3><p class="sub" id="invListSub"></p></div>
+          <div class="actions">
+            <div class="seg" id="invView" role="radiogroup" aria-label="แสดงรายการ"></div>
+            <input type="search" class="search" id="invQ" placeholder="ค้นหา SKU / ซัพพลายเออร์" aria-label="ค้นหา">
+            <button type="button" class="btn primary sm" id="invExport">ดาวน์โหลดใบสั่งซื้อ (CSV)</button>
+          </div>
+        </div>
+        <div id="invTable"></div>
+      </div>
+    </section>
+
+    <!-- ===================== LOGISTICS ===================== -->
+    <section class="page" id="p-logistics" hidden>
+      <div class="grid g-side">
+        <div class="card controls">
+          <div class="card-h"><div><h3>ตั้งค่าการเปรียบเทียบ</h3><p class="sub">น้ำหนักความสำคัญ (0–10) — ทุกเกณฑ์ยิ่งต่ำยิ่งดี</p></div></div>
+          <div class="fld-row">
+            <span class="fld-lbl">เปรียบเทียบตาม</span>
+            <div class="seg" id="logDim" role="radiogroup" aria-label="มิติที่เปรียบเทียบ"></div>
+          </div>
+          <div class="presets" id="logPresets"></div>
+          <div id="logSliders"></div>
+        </div>
+        <div class="stack-col">
+          <div class="reco-grid" id="logReco"></div>
+          <article class="card chart" id="c-log-score" data-title="คะแนนความคุ้มค่า"></article>
+        </div>
+      </div>
+      <div class="grid g-2">
+        <article class="card chart" id="c-log-cost" data-title="ค่าขนส่งเฉลี่ย"></article>
+        <article class="card chart" id="c-log-time" data-title="เวลาขนส่งเฉลี่ย (วัน)"></article>
+      </div>
+      <div class="card">
+        <div class="card-h"><div><h3>ค่าขนส่งเฉลี่ย: ผู้ให้บริการ × รูปแบบการขนส่ง</h3><p class="sub">สีเข้ม = ค่าขนส่งสูง · ตัวเลขเล็กคือจำนวน SKU</p></div></div>
+        <div id="logHeat"></div>
+      </div>
+    </section>
+
+    <!-- ===================== DATA ===================== -->
+    <section class="page" id="p-data" hidden>
+      <div class="tiles wide" id="dtTiles"></div>
+      <div class="grid g-2">
+        <div class="card">
+          <div class="card-h"><div><h3>ขั้นตอนการคลีนข้อมูล</h3><p class="sub" id="dtSrc"></p></div></div>
+          <ol class="steps" id="dtSteps"></ol>
+        </div>
+        <div class="card">
+          <div class="card-h"><div><h3>ข้อสังเกตคุณภาพข้อมูล</h3><p class="sub">สิ่งที่พบแต่ตั้งใจไม่แก้ไข</p></div></div>
+          <ul class="obs" id="dtObs"></ul>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h"><div><h3>โปรไฟล์คอลัมน์</h3><p class="sub">ชื่อเดิม → ชื่อใหม่ และสถิติหลังคลีน</p></div></div>
+        <div id="dtCols"></div>
+      </div>
+      <div class="card">
+        <div class="card-h">
+          <div><h3>ตารางข้อมูลที่คลีนแล้ว</h3><p class="sub" id="dtRowsSub"></p></div>
+          <div class="actions">
+            <input type="search" class="search" id="dtQ" placeholder="ค้นหาในตาราง" aria-label="ค้นหาในตาราง">
+            <button type="button" class="btn primary sm" id="dtExport">ดาวน์โหลด CSV</button>
+          </div>
+        </div>
+        <div id="dtTable" class="tall"></div>
+      </div>
+    </section>
+
+    <footer class="foot">Supply Chain DSS · ข้อมูลประมวลผลในเบราว์เซอร์ทั้งหมด · สร้างข้อมูลใหม่ด้วย <code>python clean.py</code></footer>
+  </main>
+</div>
+<script src="data.js"></script>
+<script src="assets/charts.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
